@@ -16,16 +16,12 @@ class MyTree:
             if node.tag == in_node.tag and node.data == in_node.data:
                 return True
         return False
-        
-    def print(self, indent = 0):
-        print("{indent}{data} ({tag})".format(
-            indent='  ' * indent,
-            tag=self.tag,
-            data=self.data,
-            nodes=[(n.tag, n.data, len(n.nodes)) for n in self.nodes]))
 
+    def visit(self, visitor, data):
+        data = visitor(self, data)
         for node in self.nodes:
-            node.print(indent+1)
+            node.visit(visitor, data)
+        return data
 
 
 class MyFileSystem:
@@ -65,8 +61,18 @@ class MyFileSystem:
         if not self.tree:
             return dir_sizes
 
-        #todo: impl this
-        
+        # todo: impl this
+
+        def tree_visitor(node, data):
+            print("{indent}{data} ({tag})".format(
+                indent='  ' * data,
+                tag=node.tag,
+                data=node.data,
+                nodes=[(n.tag, n.data, len(n.nodes)) for n in node.nodes]))
+            return data + 1
+
+        dir_sizes = self.tree.visit(tree_visitor, dir_sizes)
+
         return dir_sizes
 
 
@@ -76,7 +82,16 @@ class MyFileSystem:
             return
         
         print("Tree:")
-        self.tree.print()
+
+        def tree_visitor(node, data):
+            print("{indent}{data} ({tag})".format(
+                indent='  ' * data,
+                tag=node.tag,
+                data=node.data,
+                nodes=[(n.tag, n.data, len(n.nodes)) for n in node.nodes]))
+            return data + 1
+
+        self.tree.visit(tree_visitor, 0)
 
         
 def parse_commands(lines):
