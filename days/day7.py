@@ -56,20 +56,20 @@ class MyFileSystem:
 
         self.add_node(path, MyTree('file', (file_name, size)))
 
+    def get_dir_size(self, node):
+        # todo: impl
+        return (node.data, 123)
+
     def get_dir_sizes(self):
         dir_sizes = []
         if not self.tree:
             return dir_sizes
 
-        # todo: impl this
-
         def tree_visitor(node, data):
-            print("{indent}{data} ({tag})".format(
-                indent='  ' * data,
-                tag=node.tag,
-                data=node.data,
-                nodes=[(n.tag, n.data, len(n.nodes)) for n in node.nodes]))
-            return data + 1
+            if node.tag == 'dir':
+                dir_size = self.get_dir_size(node)
+                data.append(dir_size)
+            return data
 
         dir_sizes = self.tree.visit(tree_visitor, dir_sizes)
 
@@ -152,6 +152,10 @@ def part_one(lines):
     fs = parse_filesystem(commands)
 
     fs.print_tree()
+
+    dir_sizes = fs.get_dir_sizes()
+
+    print(dir_sizes)
 
     return 0
     
