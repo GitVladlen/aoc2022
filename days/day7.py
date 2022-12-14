@@ -6,44 +6,70 @@ lines = utils.get_file_lines("../inputs/test_1_day7.txt")
 #print(lines)
 
 class MyTree:
-    def __init__(self):
+    def __init__(self, tag, data):
         self.nodes = []
-        self.tag = None
-        self.data = None
-        
-    def print(self):
-        print(self.tag, self.data)
+        self.tag = tag
+        self.data = data
+
+    def has_node(self, in_node):
         for node in self.nodes:
-            print("inside", self.data)
-            node.print()
+            if node.tag == in_node.tag and node.data == in_node.data:
+                return True
+        return False
+        
+    def print(self, indent = 0):
+        print("{indent}{data} ({tag})".format(
+            indent='  ' * indent,
+            tag=self.tag,
+            data=self.data,
+            nodes=[(n.tag, n.data, len(n.nodes)) for n in self.nodes]))
+
+        for node in self.nodes:
+            node.print(indent+1)
+
 
 class MyFileSystem:
     def __init__(self):
         self.tree = None
+
+    def get_node_by_path(self, path):
+        cur_node = self.tree
+        for path_node in path:
+            for tree_node in cur_node.nodes:
+                if tree_node.tag == 'dir' and tree_node.data == path_node:
+                    cur_node = tree_node
+                    break
+        return cur_node
+
+    def add_node(self, path, node):
+        if self.tree is None:
+            self.tree = node
+        else:
+            cur_node = self.get_node_by_path(path)
+            
+            if not cur_node.has_node(node):
+                cur_node.nodes.append(node)
     
     def add_dir(self, path, dir_name):
-        print("add dir: path '{}' dir '{}'".format(path, dir_name))
-        if self.tree is None:
-            new_tree = MyTree()
-            new_tree.tag = 'dir'
-            new_tree.data = dir_name
-            self.tree = new_tree
-        else:
-            cur_node = self.tree
-            for path_node in path:
-                # search Tree node with cur path node
-                for tree_node in cur_node.nodes:
-                    if tree_node.tag == 'dir' and tree_node.data == path_node:
-                        cur_node = tree_node
-                        break
-                        
-            new_tree = MyTree()
-            new_tree.tag = 'dir'
-            new_tree.data = dir_name
-            
-            cur_node.nodes.append(new_tree)
-                
+        #print("  add dir: path '{}' dir '{}'".format(path, dir_name))
+
+        self.add_node(path, MyTree('dir', dir_name))
+    
+    def add_file(self, path, file_name, size):
+        #print("  add file: path '{}' name '{}' size '{}'".format(path, file_name, size))
+
+        self.add_node(path, MyTree('file', (file_name, size)))
+
+    def get_dir_sizes(self):
+        dir_sizes = []
+        if not self.tree:
+            return dir_sizes
+
+        #todo: impl this
         
+        return dir_sizes
+
+
     def print_tree(self):
         if self.tree is None:
             print("Tree is empty")
@@ -51,11 +77,7 @@ class MyFileSystem:
         
         print("Tree:")
         self.tree.print()
-        
-    
-    def add_file(self, path, file_name, size):
-        print("add file: path '{}' name '{}' size '{}'".format(path, file_name, size))
-        pass
+
         
 def parse_commands(lines):
     commands = []
@@ -84,22 +106,22 @@ def parse_commands(lines):
     return commands
 
 
-def part_one(lines):
+def parse_filesystem(commands):
     fs = MyFileSystem()
-    
-    commands = parse_commands(lines)
-    
+
     path = []
     for command in commands:
         c_id, c_nodes, c_output = command
-        print(command)
+        #print(command)
         if c_id == 'cd':
             dir_name = c_nodes[2]
             if dir_name == '..':
                 path.pop()
             else:
+                fs.add_dir(path, c_nodes[2])
                 path.append(c_nodes[2])
-            print("path:", path)
+
+            #print(" path:", path)
         elif c_id == 'ls':
             for output_nodes in c_output:
                 a, b = output_nodes
@@ -107,9 +129,15 @@ def part_one(lines):
                     fs.add_dir(path, b)
                 else:
                     fs.add_file(path, b, a)
-    
+    return fs
+
+def part_one(lines):
+    commands = parse_commands(lines)
+
+    fs = parse_filesystem(commands)
+
     fs.print_tree()
-    
+
     return 0
     
 	
