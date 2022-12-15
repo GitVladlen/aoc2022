@@ -1,7 +1,7 @@
 import utils
 
 lines = utils.get_file_lines("../inputs/input_day7.txt")
-lines = utils.get_file_lines("../inputs/test_1_day7.txt")
+#lines = utils.get_file_lines("../inputs/test_1_day7.txt")
 
 #print(lines)
 
@@ -20,7 +20,13 @@ class MyTree:
     def visit(self, visitor, data):
         data = visitor(self, data)
         for node in self.nodes:
-            node.visit(visitor, data)
+            data = node.visit(visitor, data)
+        return data
+
+    def apply(self, visitor, data):
+        data = visitor(self, data)
+        for node in self.nodes:
+            node.apply(visitor, data)
         return data
 
 
@@ -58,7 +64,15 @@ class MyFileSystem:
 
     def get_dir_size(self, node):
         # todo: impl
-        return (node.data, 123)
+        
+        def node_visitor(_node, _data):
+            if _node.tag == 'file':
+                _data += int(_node.data[1])
+            return _data
+        
+        dir_size = node.visit(node_visitor, 0)
+        
+        return (node.data, dir_size)
 
     def get_dir_sizes(self):
         dir_sizes = []
@@ -91,7 +105,7 @@ class MyFileSystem:
                 nodes=[(n.tag, n.data, len(n.nodes)) for n in node.nodes]))
             return data + 1
 
-        self.tree.visit(tree_visitor, 0)
+        self.tree.apply(tree_visitor, 0)
 
         
 def parse_commands(lines):
@@ -157,7 +171,12 @@ def part_one(lines):
 
     print(dir_sizes)
 
-    return 0
+    result = 0
+    for dir_name, dir_size in dir_sizes:
+        if dir_size <= 100000:
+            result += dir_size
+
+    return result
     
 	
 def part_two(lines):
