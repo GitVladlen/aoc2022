@@ -165,11 +165,11 @@ def part_one(lines):
 
     fs = parse_filesystem(commands)
 
-    fs.print_tree()
+    #fs.print_tree()
 
     dir_sizes = fs.get_dir_sizes()
 
-    print(dir_sizes)
+    #print(dir_sizes)
 
     result = 0
     for dir_name, dir_size in dir_sizes:
