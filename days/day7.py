@@ -1,9 +1,12 @@
 import utils
 
 lines = utils.get_file_lines("../inputs/input_day7.txt")
-#lines = utils.get_file_lines("../inputs/test_1_day7.txt")
+lines = utils.get_file_lines("../inputs/test_1_day7.txt")
 
 #print(lines)
+
+TOTAL_SPACE = 70000000
+NEEDED_SPACE = 30000000
 
 class MyTree:
     def __init__(self, tag, data):
@@ -180,7 +183,34 @@ def part_one(lines):
     
 	
 def part_two(lines):
-	return 0
+    commands = parse_commands(lines)
+
+    fs = parse_filesystem(commands)
+
+    dir_sizes = fs.get_dir_sizes()
+
+    root_dir_size = 0
+    if dir_sizes:
+        root_dir_size = dir_sizes[0][1]
+    print("root dir size is", root_dir_size)
+
+    unused_space = TOTAL_SPACE - root_dir_size
+    print("unused space is", unused_space)
+
+    if unused_space < NEEDED_SPACE:
+        print("FAIL")
+        need_to_free = NEEDED_SPACE - unused_space
+        print("need to free space", need_to_free)
+    else:
+        print("SUCCESS")
+
+
+
+    result = 0
+
+    # todo: imple solution
+
+    return result
     
 
 result_part_one = part_one(lines)
