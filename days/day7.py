@@ -1,9 +1,7 @@
 import utils
 
 lines = utils.get_file_lines("../inputs/input_day7.txt")
-lines = utils.get_file_lines("../inputs/test_1_day7.txt")
-
-#print(lines)
+#lines = utils.get_file_lines("../inputs/test_1_day7.txt")
 
 TOTAL_SPACE = 70000000
 NEEDED_SPACE = 30000000
@@ -56,18 +54,12 @@ class MyFileSystem:
                 cur_node.nodes.append(node)
     
     def add_dir(self, path, dir_name):
-        #print("  add dir: path '{}' dir '{}'".format(path, dir_name))
-
         self.add_node(path, MyTree('dir', dir_name))
     
     def add_file(self, path, file_name, size):
-        #print("  add file: path '{}' name '{}' size '{}'".format(path, file_name, size))
-
         self.add_node(path, MyTree('file', (file_name, size)))
 
-    def get_dir_size(self, node):
-        # todo: impl
-        
+    def get_dir_size(self, node):        
         def node_visitor(_node, _data):
             if _node.tag == 'file':
                 _data += int(_node.data[1])
@@ -144,7 +136,6 @@ def parse_filesystem(commands):
     path = []
     for command in commands:
         c_id, c_nodes, c_output = command
-        #print(command)
         if c_id == 'cd':
             dir_name = c_nodes[2]
             if dir_name == '..':
@@ -152,8 +143,6 @@ def parse_filesystem(commands):
             else:
                 fs.add_dir(path, c_nodes[2])
                 path.append(c_nodes[2])
-
-            #print(" path:", path)
         elif c_id == 'ls':
             for output_nodes in c_output:
                 a, b = output_nodes
@@ -192,23 +181,43 @@ def part_two(lines):
     root_dir_size = 0
     if dir_sizes:
         root_dir_size = dir_sizes[0][1]
-    print("root dir size is", root_dir_size)
+    #print("Root dir size is", root_dir_size)
 
     unused_space = TOTAL_SPACE - root_dir_size
-    print("unused space is", unused_space)
-
-    if unused_space < NEEDED_SPACE:
-        print("FAIL")
-        need_to_free = NEEDED_SPACE - unused_space
-        print("need to free space", need_to_free)
-    else:
-        print("SUCCESS")
-
-
+    #print("Unused space is", unused_space)
 
     result = 0
+    
+    if unused_space < NEEDED_SPACE:
+        need_to_free = NEEDED_SPACE - unused_space
+        #print("Need to free space", need_to_free)
 
-    # todo: imple solution
+        candidates = []
+        
+        for dir_name, dir_size in dir_sizes:
+            if dir_size >= need_to_free:
+                candidates.append((dir_name, dir_size))
+
+        #print("Candidates to delete:")
+        min_dir = None
+        min_size = None
+        for dir_name, dir_size in candidates:
+            #print(dir_name, dir_size)
+            if min_dir is None:
+                min_dir = dir_name
+                min_size = dir_size
+                continue
+
+            if min_size > dir_size:
+                min_dir = dir_name
+                min_size = dir_size
+
+        #print("Smallest dir is {} with size {}".format(min_dir, min_size))
+        result = min_size
+        
+    else:
+        #print("No need to free space")
+        pass
 
     return result
     
