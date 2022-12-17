@@ -14,3 +14,12 @@ def get_file_lines(f_name):
   except:
     print("Unexpected error:", sys.info()[0])
   return lines
+
+IS_LOG_DEBUG = False
+
+def LOG_PRINT(*arg, **kwargs):
+  print(*arg, **kwargs)
+
+def LOG_DEBUG(*arg, **kwargs):
+  if IS_LOG_DEBUG:
+    print(*arg, **kwargs)

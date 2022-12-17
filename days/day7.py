@@ -1,10 +1,13 @@
 import utils
+from utils import LOG_PRINT, LOG_DEBUG
 
 lines = utils.get_file_lines("../inputs/input_day7.txt")
 #lines = utils.get_file_lines("../inputs/test_1_day7.txt")
 
 TOTAL_SPACE = 70000000
 NEEDED_SPACE = 30000000
+
+#utils.IS_LOG_DEBUG = True
 
 class MyTree:
     def __init__(self, tag, data):
@@ -87,13 +90,13 @@ class MyFileSystem:
 
     def print_tree(self):
         if self.tree is None:
-            print("Tree is empty")
+            LOG_DEBUG("Tree is empty")
             return
         
-        print("Tree:")
+        LOG_DEBUG("Tree:")
 
         def tree_visitor(node, data):
-            print("{indent}{data} ({tag})".format(
+            LOG_DEBUG("{indent}{data} ({tag})".format(
                 indent='  ' * data,
                 tag=node.tag,
                 data=node.data,
@@ -157,11 +160,11 @@ def part_one(lines):
 
     fs = parse_filesystem(commands)
 
-    #fs.print_tree()
+    fs.print_tree()
 
     dir_sizes = fs.get_dir_sizes()
 
-    #print(dir_sizes)
+    LOG_DEBUG(dir_sizes)
 
     result = 0
     for dir_name, dir_size in dir_sizes:
@@ -181,16 +184,16 @@ def part_two(lines):
     root_dir_size = 0
     if dir_sizes:
         root_dir_size = dir_sizes[0][1]
-    #print("Root dir size is", root_dir_size)
+    LOG_DEBUG("Root dir size is", root_dir_size)
 
     unused_space = TOTAL_SPACE - root_dir_size
-    #print("Unused space is", unused_space)
+    LOG_DEBUG("Unused space is", unused_space)
 
     result = 0
     
     if unused_space < NEEDED_SPACE:
         need_to_free = NEEDED_SPACE - unused_space
-        #print("Need to free space", need_to_free)
+        LOG_DEBUG("Need to free space", need_to_free)
 
         candidates = []
         
@@ -198,11 +201,11 @@ def part_two(lines):
             if dir_size >= need_to_free:
                 candidates.append((dir_name, dir_size))
 
-        #print("Candidates to delete:")
+        LOG_DEBUG("Candidates to delete:")
         min_dir = None
         min_size = None
         for dir_name, dir_size in candidates:
-            #print(dir_name, dir_size)
+            LOG_DEBUG(dir_name, dir_size)
             if min_dir is None:
                 min_dir = dir_name
                 min_size = dir_size
@@ -212,11 +215,11 @@ def part_two(lines):
                 min_dir = dir_name
                 min_size = dir_size
 
-        #print("Smallest dir is {} with size {}".format(min_dir, min_size))
+        LOG_DEBUG("Smallest dir is {} with size {}".format(min_dir, min_size))
         result = min_size
         
     else:
-        #print("No need to free space")
+        LOG_DEBUG("No need to free space")
         pass
 
     return result
